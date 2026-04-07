@@ -1,34 +1,34 @@
 "use client";
 
 import { useRef } from "react";
-import { QrCode, Wifi, Link, FileText, Database, PanelsTopLeft, FileSpreadsheet, Utensils, Smartphone, LayoutDashboard, Barcode, Music, Video, ChevronLeft, ChevronRight } from "lucide-react";
+import { QrCode, Wifi, Link, FileText, Database, PanelsTopLeft, FileSpreadsheet, Utensils, Smartphone, LayoutDashboard, Barcode, Music, Video, ChevronLeft, ChevronRight, Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export type TabType = "url" | "vcard" | "file" | "linkpage" | "form" | "menu" | "appstore" | "landing" | "smarturl" | "gs1" | "mp3" | "video" | "wifi";
 
 interface HeaderProps {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
-  qrType: "static" | "dynamic";
-  setQrType: (type: "static" | "dynamic") => void;
 }
 
-export default function Header({ activeTab, setActiveTab, qrType, setQrType }: HeaderProps) {
+export default function Header({ activeTab, setActiveTab }: HeaderProps) {
   const carouselRef = useRef<HTMLDivElement>(null);
+  const { t, language, toggleLanguage } = useLanguage();
 
   const navItems: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: "url", label: "URL", icon: <Link size={18} /> },
-    { id: "vcard", label: "vCard", icon: <Database size={18} /> },
-    { id: "file", label: "File", icon: <FileText size={18} /> },
-    { id: "linkpage", label: "Link Page", icon: <PanelsTopLeft size={18} /> },
-    { id: "form", label: "Google Form", icon: <FileSpreadsheet size={18} /> },
-    { id: "menu", label: "Menu", icon: <Utensils size={18} /> },
-    { id: "appstore", label: "App stores", icon: <Smartphone size={18} /> },
-    { id: "landing", label: "Landing page", icon: <LayoutDashboard size={18} /> },
-    { id: "smarturl", label: "Smart URL", icon: <QrCode size={18} /> },
-    { id: "gs1", label: "GS1 Digital", icon: <Barcode size={18} /> },
-    { id: "mp3", label: "MP3", icon: <Music size={18} /> },
-    { id: "video", label: "Video", icon: <Video size={18} /> },
-    { id: "wifi", label: "WiFi", icon: <Wifi size={18} /> },
+    { id: "url", label: t.url || "URL", icon: <Link size={18} /> },
+    { id: "vcard", label: t.vcard || "vCard", icon: <Database size={18} /> },
+    { id: "file", label: t.pdf || "File", icon: <FileText size={18} /> },
+    { id: "linkpage", label: t.linkpage || "Link Page", icon: <PanelsTopLeft size={18} /> },
+    { id: "form", label: t.form || "Google Form", icon: <FileSpreadsheet size={18} /> },
+    { id: "menu", label: t.menu || "Menu", icon: <Utensils size={18} /> },
+    { id: "appstore", label: t.app || "App stores", icon: <Smartphone size={18} /> },
+    { id: "landing", label: t.landing || "Landing page", icon: <LayoutDashboard size={18} /> },
+    { id: "smarturl", label: t.smarturl || "Smart URL", icon: <QrCode size={18} /> },
+    { id: "gs1", label: t.gs1 || "GS1 Digital", icon: <Barcode size={18} /> },
+    { id: "mp3", label: t.mp3 || "MP3", icon: <Music size={18} /> },
+    { id: "video", label: t.video || "Video", icon: <Video size={18} /> },
+    { id: "wifi", label: t.wifi || "WiFi", icon: <Wifi size={18} /> },
   ];
 
   const scroll = (direction: "left" | "right") => {
@@ -40,9 +40,18 @@ export default function Header({ activeTab, setActiveTab, qrType, setQrType }: H
 
   return (
     <header className="header-container">
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        <QrCode size={28} color="var(--accent-cyan)" />
-        <span style={{ fontSize: "1.5rem", fontWeight: "bold", letterSpacing: "1px" }}>QR Neon<span style={{ color: "var(--accent-magenta)" }}>Gen</span></span>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <QrCode size={28} color="var(--accent-cyan)" />
+          <span style={{ fontSize: "1.5rem", fontWeight: "bold", letterSpacing: "1px" }}>QR Neon<span style={{ color: "var(--accent-magenta)" }}>Gen</span></span>
+        </div>
+        <button 
+          onClick={toggleLanguage}
+          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0.8rem", borderRadius: "12px", cursor: "pointer", transition: "all 0.2s ease" }}
+        >
+          <Globe size={16} />
+          <span style={{ fontSize: "0.85rem", fontWeight: "bold" }}>{language.toUpperCase()}</span>
+        </button>
       </div>
 
       <div className="nav-wrapper">
@@ -68,20 +77,6 @@ export default function Header({ activeTab, setActiveTab, qrType, setQrType }: H
         </button>
       </div>
 
-      <div className="toggle-container">
-        <button 
-          onClick={() => setQrType("static")}
-          className={`toggle-btn ${qrType === "static" ? "active" : ""}`}
-        >
-           Static
-        </button>
-        <button 
-           onClick={() => setQrType("dynamic")}
-          className={`toggle-btn ${qrType === "dynamic" ? "active" : ""}`}
-        >
-           Dynamic
-        </button>
-      </div>
     </header>
   );
 }
