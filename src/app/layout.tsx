@@ -77,6 +77,7 @@ export default function RootLayout({
             crossOrigin="anonymous"
           ></script>
         )}
+        <meta name="google-adsense-account" content="ca-pub-6908025438376091" />
       </head>
       <body className={`${outfit.variable} ${outfit.className}`}>
         <LanguageProvider>
