@@ -16,6 +16,8 @@ export default function QRPanel({ activeTab }: QRPanelProps) {
   const [url, setUrl] = useState("https://ejemplo.com");
   const [vcardData, setVcardData] = useState({ name: "", phone: "", email: "" });
   const [wifiData, setWifiData] = useState({ ssid: "", password: "" });
+  const [appStoreData, setAppStoreData] = useState({ ios: "", android: "" });
+  const [linkPageData, setLinkPageData] = useState([{ title: "Mi Enlace", url: "https://" }]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
   const [expiration, setExpiration] = useState<number>(30); // 30, 90 o 0 (Ilimitado)
@@ -50,10 +52,19 @@ export default function QRPanel({ activeTab }: QRPanelProps) {
     }
 
     let data = "https://ejemplo.com";
-    if (activeTab === "url") data = url || "https://ejemplo.com";
-    else if (activeTab === "vcard") data = `BEGIN:VCARD\nFN:${vcardData.name}\nTEL:${vcardData.phone}\nEMAIL:${vcardData.email}\nEND:VCARD`;
-    else if (activeTab === "wifi") data = `WIFI:T:WPA;S:${wifiData.ssid};P:${wifiData.password};;`;
-    else data = `${activeTab.toUpperCase()} Placeholder`;
+    if (activeTab === "url" || ["file", "form", "menu", "landing", "smarturl", "gs1", "mp3", "video"].includes(activeTab)) {
+      data = url || "https://ejemplo.com";
+    } else if (activeTab === "vcard") {
+      data = `BEGIN:VCARD\nFN:${vcardData.name}\nTEL:${vcardData.phone}\nEMAIL:${vcardData.email}\nEND:VCARD`;
+    } else if (activeTab === "wifi") {
+      data = `WIFI:T:WPA;S:${wifiData.ssid};P:${wifiData.password};;`;
+    } else if (activeTab === "appstore") {
+      data = appStoreData.ios || appStoreData.android || "https://ejemplo.com";
+    } else if (activeTab === "linkpage") {
+      data = linkPageData[0]?.url || "https://ejemplo.com";
+    } else {
+      data = `${activeTab.toUpperCase()} Placeholder`;
+    }
 
     qrCode.update({ data });
   }, [activeTab, url, vcardData, wifiData, qrCode, generatedUrl]);
@@ -63,10 +74,19 @@ export default function QRPanel({ activeTab }: QRPanelProps) {
     setGeneratedUrl(null);
     try {
       let contentData: any = {};
-      if (activeTab === "url") contentData = { url };
-      else if (activeTab === "vcard") contentData = { ...vcardData };
-      else if (activeTab === "wifi") contentData = { ...wifiData };
-      else contentData = { placeholder: true };
+      if (["url", "file", "form", "menu", "landing", "smarturl", "gs1", "mp3", "video"].includes(activeTab)) {
+        contentData = { url };
+      } else if (activeTab === "vcard") {
+        contentData = { ...vcardData };
+      } else if (activeTab === "wifi") {
+        contentData = { ...wifiData };
+      } else if (activeTab === "appstore") {
+        contentData = { ...appStoreData };
+      } else if (activeTab === "linkpage") {
+        contentData = { links: linkPageData };
+      } else {
+        contentData = { placeholder: true };
+      }
       
       const short_id = Math.random().toString(36).substring(2, 8);
       
@@ -159,14 +179,77 @@ export default function QRPanel({ activeTab }: QRPanelProps) {
         </div>
       );
     }
-    return (
-      <div className="input-group">
-         <label style={{color: "var(--text-secondary)", fontSize: "0.9rem"}}>Configuración de {activeTab.toUpperCase()}</label>
-         <div className="custom-input" style={{ textAlign: "center", color: "var(--text-secondary)" }}>
-            Sube tu archivo o configura aquí. (Próximamente Fase 3)
+    if (activeTab === "appstore") {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="input-group">
+            <label>{t.app_ios || "Enlace App Store (iOS)"}</label>
+            <input type="url" placeholder="https://apps.apple.com/..." value={appStoreData.ios} onChange={(e) => setAppStoreData({...appStoreData, ios: e.target.value})} className="custom-input" />
+          </div>
+          <div className="input-group">
+            <label>{t.app_android || "Enlace Google Play (Android)"}</label>
+            <input type="url" placeholder="https://play.google.com/..." value={appStoreData.android} onChange={(e) => setAppStoreData({...appStoreData, android: e.target.value})} className="custom-input" />
+          </div>
+        </div>
+      );
+    }
+    
+    if (activeTab === "linkpage") {
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <label style={{color: "var(--text-secondary)", fontSize: "0.9rem"}}>{t.linkpage_title || "Añade múltiples enlaces (Ej: Redes Sociales)"}</label>
+          {linkPageData.map((link, idx) => (
+            <div key={idx} style={{ display: "flex", gap: "0.5rem" }}>
+              <input type="text" placeholder="Título" value={link.title} onChange={(e) => {
+                const newLinks = [...linkPageData];
+                newLinks[idx].title = e.target.value;
+                setLinkPageData(newLinks);
+              }} className="custom-input" style={{flex: 1}} />
+              <input type="url" placeholder="URL" value={link.url} onChange={(e) => {
+                const newLinks = [...linkPageData];
+                newLinks[idx].url = e.target.value;
+                setLinkPageData(newLinks);
+              }} className="custom-input" style={{flex: 2}} />
+            </div>
+          ))}
+          {linkPageData.length < 5 && (
+            <button onClick={() => setLinkPageData([...linkPageData, {title: "", url: ""}])} style={{ color: "var(--accent-cyan)", textDecoration: "underline", fontSize: "0.85rem", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              + Añadir otro enlace
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Formularios genéricos que requieren solo de un enlace adaptado al contexto
+    if (["file", "form", "menu", "landing", "smarturl", "gs1", "mp3", "video"].includes(activeTab)) {
+       let specialLabel = "URL de destino";
+       let specialPlaceholder = "https://ejemplo.com";
+       
+       if (activeTab === "file") { specialLabel = "URL de tu archivo PDF"; specialPlaceholder = "https://tudrive.com/archivo.pdf"; }
+       if (activeTab === "form") { specialLabel = "URL de tu formulario"; specialPlaceholder = "https://forms.google.com/..."; }
+       if (activeTab === "menu") { specialLabel = "URL de tu Carta / Menú"; specialPlaceholder = "https://turestaurante.com/menu"; }
+       if (activeTab === "video") { specialLabel = "URL de YouTube, Vimeo..."; specialPlaceholder = "https://youtube.com/watch?v=..."; }
+       if (activeTab === "mp3") { specialLabel = "URL de Spotify, SoundCloud..."; specialPlaceholder = "https://spotify.com/track/..."; }
+       
+       return (
+         <div className="input-group">
+           <label>{(t as any)[`${activeTab}_url`] || specialLabel}</label>
+           <input 
+             type="url" 
+             value={url} 
+             onChange={(e) => setUrl(e.target.value)}
+             className="custom-input"
+             placeholder={specialPlaceholder}
+           />
+           <button style={{color: "var(--text-secondary)", fontSize: "0.85rem", textAlign: "left", textDecoration: "underline", marginTop: "0.5rem", background: "none", border: "none", cursor: "pointer", padding: 0}}>
+             Alojamiento en nuestros servidores disponible próximamente 🔒
+           </button>
          </div>
-      </div>
-    );
+       );
+    }
+
+    return null;
   };
 
   return (

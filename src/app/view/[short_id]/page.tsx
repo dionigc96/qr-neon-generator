@@ -71,7 +71,30 @@ export default async function QRViewPage({
           </div>
         )}
 
-        {type !== "vcard" && type !== "wifi" && (
+        {type === "linkpage" && content.links && (
+          <div>
+             <div style={{ background: "rgba(0,150,255,0.1)", width: "80px", height: "80px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem auto", boxShadow: "0 0 15px rgba(0,150,255,0.3)" }}>
+                <QrCode size={40} color="#0096ff" />
+             </div>
+             <h1 style={{ fontSize: "1.8rem", marginBottom: "2rem" }}>Mis Enlaces</h1>
+             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {content.links.map((link: any, i: number) => (
+                  <a
+                    key={i}
+                    href={link.url.startsWith("http") ? link.url : `https://${link.url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="generate-btn"
+                    style={{ textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text-primary)" }}
+                  >
+                    {link.title || "Enlace"}
+                  </a>
+                ))}
+             </div>
+          </div>
+        )}
+
+        {type !== "vcard" && type !== "wifi" && type !== "linkpage" && (
            <div>
              <QrCode size={60} color="var(--text-secondary)" style={{ margin: "0 auto 1.5rem auto" }} />
              <h1 style={{ fontSize: "1.5rem" }}>Cargando contenido...</h1>

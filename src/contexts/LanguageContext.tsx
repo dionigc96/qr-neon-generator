@@ -53,6 +53,17 @@ export const translations = {
     expired_title: "Enlace Caducado",
     expired_desc: "Este código QR ha superado su fecha de validez y ya no se encuentra disponible.",
     generate_new: "Generar Nuevo QR",
+    app_ios: "Enlace App Store (iOS)",
+    app_android: "Enlace Google Play (Android)",
+    linkpage_title: "Añade múltiples enlaces (Ej: Redes Sociales)",
+    file_url: "URL de tu archivo PDF",
+    form_url: "URL de tu formulario",
+    menu_url: "URL de tu Carta / Menú",
+    landing_url: "URL de tu Landing Page",
+    smarturl_url: "URL destino inteligente",
+    gs1_url: "Datos del código GS1 Digital Link",
+    mp3_url: "URL de tu pista de Audio (Spotify, MP3...)",
+    video_url: "URL de tu Video (YouTube, Vimeo...)",
   },
   en: {
     // page.tsx
@@ -102,6 +113,17 @@ export const translations = {
     expired_title: "Link Expired",
     expired_desc: "This QR code has exceeded its validity date and is no longer available.",
     generate_new: "Generate New QR",
+    app_ios: "App Store Link (iOS)",
+    app_android: "Google Play Link (Android)",
+    linkpage_title: "Add multiple links (e.g. Socials)",
+    file_url: "URL of your PDF file",
+    form_url: "URL of your Form",
+    menu_url: "URL of your Menu",
+    landing_url: "URL of your Landing Page",
+    smarturl_url: "Smart target URL",
+    gs1_url: "GS1 Digital Link data",
+    mp3_url: "URL of your Audio track (Spotify, MP3...)",
+    video_url: "URL of your Video (YouTube, Vimeo...)",
   }
 };
 

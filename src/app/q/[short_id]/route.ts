@@ -46,7 +46,9 @@ export async function GET(
       });
 
     // 3. Routing Logic
-    if (qrData.type === "url" && qrData.content?.url) {
+    const directUrlTypes = ["url", "file", "form", "menu", "landing", "smarturl", "gs1", "mp3", "video"];
+    
+    if (directUrlTypes.includes(qrData.type) && qrData.content?.url) {
       // Direct 302 Redirect to external absolute URL
       let dest = qrData.content.url;
       // Ensure it has http/https
@@ -55,8 +57,22 @@ export async function GET(
       }
       return NextResponse.redirect(dest, { status: 302 });
     }
+    
+    if (qrData.type === "appstore" && qrData.content) {
+       const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+       const isAndroid = /android/i.test(userAgent);
+       let dest = "https://example.com";
+       if (isIOS && qrData.content.ios) dest = qrData.content.ios;
+       else if (isAndroid && qrData.content.android) dest = qrData.content.android;
+       else dest = qrData.content.ios || qrData.content.android || "https://example.com";
+       
+       if (!dest.startsWith("http://") && !dest.startsWith("https://")) {
+         dest = `https://${dest}`;
+       }
+       return NextResponse.redirect(dest, { status: 302 });
+    }
 
-    // Fallback or specific visual representation for vCards, Wifi etc.
+    // Fallback or specific visual representation for vCards, Wifi, linkpage etc.
     return NextResponse.redirect(new URL(`/view/${short_id}`, request.url));
   } catch (err) {
     console.error("Unexpected error in routing:", err);
