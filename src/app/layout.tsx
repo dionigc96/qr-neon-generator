@@ -69,6 +69,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+          <script 
+            async 
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`} 
+            crossOrigin="anonymous"
+          ></script>
+        )}
+      </head>
       <body className={`${outfit.variable} ${outfit.className}`}>
         <LanguageProvider>
           <script
@@ -92,15 +101,6 @@ export default function RootLayout({
           />
           {children}
         </LanguageProvider>
-        
-        {/* Google AdSense Script - Se carga solo si el Client ID está configurado */}
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          ></script>
-        )}
       </body>
     </html>
   );
